@@ -12,20 +12,6 @@ if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
         });
     </script>";
 }
-
-if (isset($_GET['error'])) {
-    // JavaScript-код для показа SweetAlert2 всплывающего окна с сообщением об ошибке
-    echo "<script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Error:',
-            text: '".addslashes($_GET['error'])."', // Используем addslashes для экранирования текста ошибки
-            confirmButtonText: 'OK'
-        }).then(() => {
-            window.location.href = 'index.php';
-        });
-    </script>";
-}
 ?>
 
 
@@ -111,19 +97,38 @@ if (isset($_GET['error'])) {
     <div class="login-container">
         <img src="path_to_your_logo.png" alt="Company Logo">
         <h1>Login to Your Account</h1>
-        <form action="login_process.php" method="post">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+		<form action="login_process.php" method="post">
+		<label for="email">Email:</label>
+		<input type="email" id="email" name="email" required>
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+		<label for="password">Password:</label>
+		<input type="password" id="password" name="password" required>
 
-            <input type="submit" value="Login">
-        </form>
+		<input type="submit" value="Login">
+		</form>
+
         <p>Don't have an account? <a href="registration_form.php">Register here</a></p>
     </div>
 	<div id="feedback-widget">✉️</div>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
 	
+	 <?php
+    if (isset($_GET['error'])) {
+        // JavaScript code for showing SweetAlert2 error message
+        echo "<script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error:',
+                text: '".addslashes($_GET['error'])."', // Используем addslashes для экранирования текста ошибки
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = 'index.php';
+            });
+        </script>";
+    }
+    ?>
+
+
 	<script>
     // Открыть форму обратной связи при нажатии на виджет
     document.getElementById('feedback-widget').addEventListener('click', function() {
