@@ -22,7 +22,19 @@
             margin-top: 10px;
         }
         
-        .search-bar input[type="text"],
+        .search-bar input[type="text"] {
+		/* Add your desired styles here */
+		width: 500px;
+		height: 25px;
+		padding: 5px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		font-size: 14px;
+		left: 500px; 
+		}
+		.search-bar, .product-list {
+		margin-left: 20px; /* Adjust the value as needed */
+		}
         .search-bar button {
             font-size: 16px;
             padding: 5px 10px;
