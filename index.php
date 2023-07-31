@@ -1,3 +1,34 @@
+<?php
+if (isset($_GET['registration']) && $_GET['registration'] === 'success') {
+    // JavaScript-код для показа SweetAlert2 всплывающего окна с сообщением об успешной регистрации
+    echo "<script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Registration successful!',
+            text: 'Your registration was successful.',
+            confirmButtonText: 'OK'
+        }).then(() => {
+            window.location.href = 'index.php';
+        });
+    </script>";
+}
+
+if (isset($_GET['error'])) {
+    // JavaScript-код для показа SweetAlert2 всплывающего окна с сообщением об ошибке
+    echo "<script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error:',
+            text: '".addslashes($_GET['error'])."', // Используем addslashes для экранирования текста ошибки
+            confirmButtonText: 'OK'
+        }).then(() => {
+            window.location.href = 'index.php';
+        });
+    </script>";
+}
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -57,6 +88,24 @@
             color: #4CAF50;
         }
     </style>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+	<style>
+        /* Стили для разворачивающегося виджета */
+        #feedback-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #007bff;
+            border-radius: 50%;
+            color: #fff;
+            text-align: center;
+            line-height: 60px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
@@ -73,5 +122,54 @@
         </form>
         <p>Don't have an account? <a href="registration_form.php">Register here</a></p>
     </div>
+	<div id="feedback-widget">✉️</div>
+	
+	<script>
+    // Открыть форму обратной связи при нажатии на виджет
+    document.getElementById('feedback-widget').addEventListener('click', function() {
+        Swal.fire({
+            title: 'Feedback',
+            html:
+                '<input id="swal-input1" class="swal2-input" placeholder="Name">' +
+                '<input id="swal-input2" class="swal2-input" placeholder="Email">' +
+                '<textarea id="swal-input3" class="swal2-textarea" placeholder="Message"></textarea>',
+            confirmButtonText: 'Send',
+            preConfirm: function () {
+                return new Promise(function (resolve) {
+                    var name = document.getElementById('swal-input1').value;
+                    var email = document.getElementById('swal-input2').value;
+                    var message = document.getElementById('swal-input3').value;
+                    resolve({ name: name, email: email, message: message });
+                });
+            }
+        }).then(function (result) {
+            // Отправка данных обратной связи на сервер (здесь вызовите PHP-скрипт для добавления данных в базу)
+            // Пример отправки данных через fetch API
+            if (result.value) {
+                fetch('feedback.php', {
+                    method: 'POST',
+                    body: JSON.stringify(result.value),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(function(response) {
+                    if (response.ok) {
+                        Swal.fire('Thank you!', 'Your feedback has been submitted.', 'success');
+                    } else {
+                        Swal.fire('Error!', 'An error occurred while submitting feedback.', 'error');
+                    }
+                })
+                .catch(function(error) {
+                    Swal.fire('Error!', 'An error occurred while submitting feedback.', 'error');
+                });
+            }
+        });
+
+        // Предотвращение отправки формы при нажатии на кнопку "Send"
+        // (предотвращение действия по умолчанию)
+        event.preventDefault();
+    });
+	</script>
 </body>
 </html>

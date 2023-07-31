@@ -28,7 +28,7 @@
         .registration-container input[type="text"],
         .registration-container input[type="email"],
         .registration-container input[type="password"] {
-            width: 100%;
+            width: 90%;
             padding: 8px;
             margin-bottom: 10px;
             border: 1px solid #ccc;

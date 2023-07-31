@@ -35,11 +35,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bindParam(':phone_number', $phone_number);
     $stmt->bindParam(':password', $hashed_password);
     
-    try {
-        $stmt->execute();
-        echo "Registration successful!"; // Успешная регистрация
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage(); // Ошибка при регистрации
-    }
+	try {
+		$stmt->execute();
+		header("Location: index.php?registration=success"); // Перенаправляем на index.php с параметром success
+		exit; // Убедитесь, что после перенаправления больше ничего не выполняется
+	} catch (PDOException $e) {
+		header("Location: index.php?error=" . urlencode($e->getMessage())); // Перенаправляем на index.php с параметром error содержащим текст ошибки
+		exit;
+	}
 }
 ?>
