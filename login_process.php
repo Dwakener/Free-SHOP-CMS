@@ -1,7 +1,7 @@
 <?php
 // Чтение настроек подключения из config.ini
 $config = parse_ini_file('config.ini');
-
+session_start();
 // Подключение к базе данных PostgreSQL с использованием PDO
 try {
     $pdo = new PDO("pgsql:host=" . $config['host'] . ";dbname=" . $config['dbname'], $config['username'], $config['password']);
@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
 
     // Получаем хеш пароля из базы данных на основе переданного email
-    $stmt = $pdo->prepare("SELECT password_hash FROM customers WHERE email = :email");
+    $stmt = $pdo->prepare("SELECT id, password_hash FROM customers WHERE email = :email");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Если пароль совпадает, значит пользователь авторизован
         // Здесь вы можете выполнить дополнительные действия для авторизованного пользователя
         // Например, установить сессию или перенаправить на другую страницу
+		$_SESSION['user_id'] = $result['id'];
         header("Location: profile.php");
         exit;
     } else {
