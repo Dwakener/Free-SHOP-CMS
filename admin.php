@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.2">
     <title>Admin Panel</title>
     <style>
         /* Add your CSS styles here */
@@ -56,6 +56,19 @@
             margin-bottom: 20px;
         }
     </style>
+	<script>
+        function loadProductPanel() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'add_product_panel.php', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    document.getElementById('productPanel').innerHTML = xhr.responseText;
+                }
+            };
+            xhr.send();
+        }
+    </script>
+	<link rel="stylesheet" type="text/css" href="addpoductstyles.css">
 </head>
 <body>
     <!-- Sidebar -->
@@ -63,32 +76,23 @@
         <h1>Admin Panel</h1>
         <ul>
             <li><a href="#dashboard">Dashboard</a></li>
-            <li><a href="#products">Products</a></li>
+            <li><a href="#" onclick="loadProductPanel()">Products</a></li>
             <li><a href="#orders">Orders</a></li>
             <!-- Add more navigation links here -->
         </ul>
     </div>
 
-    <!-- Content Area -->
+	<!-- Content -->
     <div class="content">
         <h2>Welcome, Admin!</h2>
         <!-- Add your admin panel content here -->
-        <form action="add_product.php" method="post">
-            <label for="product_name">Product Name:</label>
-            <input type="text" id="product_name" name="product_name" required><br>
-
-            <label for="product_description">Product Description:</label>
-            <textarea id="product_description" name="product_description" required></textarea><br>
-
-            <label for="product_price">Product Price:</label>
-            <input type="number" id="product_price" name="product_price" min="0.01" step="0.01" required><br>
-
-            <label for="image_url">Image URL:</label>
-            <input type="text" id="image_url" name="image_url" required><br>
-
-            <input type="submit" value="Add Product">
+        <form action="add_product.php" method="post" style="margin-bottom: 10px;">
+            <!-- Форма для добавления продукта -->
         </form>
     </div>
+
+    <!-- Вставляем содержимое add_product_panel.php -->
+    <div id="productPanel"></div>
 
     <!-- Add your JavaScript code here (if needed) -->
     <script>

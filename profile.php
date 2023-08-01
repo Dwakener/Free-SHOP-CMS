@@ -54,6 +54,20 @@ if (isset($_SESSION['user_id'])) {
             border-radius: 4px;
         }
     </style>
+	<style>
+	.product-image-container {
+		width: 350px;
+		height: 350px;
+		overflow: hidden;
+	}
+
+	.product-image-container img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	</style>
+
 </head>
 <body>
     <header>
@@ -75,35 +89,53 @@ if (isset($_SESSION['user_id'])) {
 
 	<div class="main-content">
 	<div class="product-list">
-    <?php
-		session_start(); // Добавляем эту строку, чтобы инициализировать сессию
+	<?php
+	session_start();
 
-		$currentUserId = $_SESSION['user_id'];
-
+	try {
+		// Load configuration from config.ini
 		$config = parse_ini_file('config.ini');
+    
+		// Connect to the database using PDO with error handling
 		$pdo = new PDO("pgsql:host=" . $config['host'] . ";dbname=" . $config['dbname'], $config['username'], $config['password']);
+		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+		// Fetch products from the database
 		$stmt = $pdo->query("SELECT * FROM products");
 
+		// Display product cards
 		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			echo '<div class="product">';
-			echo '<img src="' . $row['image_url'] . '" alt="' . $row['name'] . '">';
-			echo '<h3>' . $row['name'] . '</h3>';
-			echo '<p>' . $row['description'] . '</p>';
-			echo '<button class="add-to-cart-btn" data-product-id="' . $row['id'] . '">Add to Cart</button>';
-    
+			echo '<div class="product-image-container">';
+			// Check if image_url is set, else use a fallback image URL
+			$imageUrl = isset($row['image_url']) ? htmlspecialchars($row['image_url']) : 'fallback_image.jpg';
+			echo '<img src="' . $imageUrl . '" alt="' . (isset($row['name']) ? htmlspecialchars($row['name']) : '') . '">';
+
+			echo '</div>'; // Close product-image-container
+
+			echo '<h3>' . (isset($row['name']) ? htmlspecialchars($row['name']) : '') . '</h3>';
+			echo '<p>' . (isset($row['description']) ? htmlspecialchars($row['description']) : '') . '</p>';
+			echo '<button class="add-to-cart-btn" data-product-id="' . (isset($row['id']) ? htmlspecialchars($row['id']) : '') . '">Add to Cart</button>';
+
 			// Display the current quantity of the product in the shopping cart (if any)
 			$cartItemStmt = $pdo->prepare("SELECT quantity FROM shopping_cart WHERE user_id = :user_id AND product_id = :product_id");
-			$cartItemStmt->bindParam(':user_id', $currentUserId);
+			$cartItemStmt->bindParam(':user_id', $_SESSION['user_id']);
 			$cartItemStmt->bindParam(':product_id', $row['id']);
 			$cartItemStmt->execute();
 			$cartItem = $cartItemStmt->fetch(PDO::FETCH_ASSOC);
-    
+
 			if ($cartItem) {
-				echo '<span>Quantity in Cart: ' . $cartItem['quantity'] . '</span>';
+				echo '<br>';
+				echo '<span>Quantity in Cart: ' . (isset($cartItem['quantity']) ? htmlspecialchars($cartItem['quantity']) : '') . '</span>';
 			}
-    
+
 			echo '</div>';
 		}
+	} 
+	catch (PDOException $e) {
+		// Handle any database connection or query errors
+		die("Database Error: " . $e->getMessage());
+	}
 	?>
 
     </div>

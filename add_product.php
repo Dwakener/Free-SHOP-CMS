@@ -16,12 +16,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $productDescription = $_POST["product_description"];
     $productPrice = $_POST["product_price"];
     $imageUrl = $_POST["image_url"];
+    $categoryID = $_POST["category_id"];
+    $brand = $_POST["brand"];
+    $weight = $_POST["weight"];
+    $color = $_POST["color"];
+    $material = $_POST["material"];
+    $stockQuantity = $_POST["stock_quantity"];
+    $isAvailable = isset($_POST["is_available"]) ? 1 : 0; // Преобразуем чекбокс в 0 или 1
+    $createdAt = $_POST["created_at"];
 
     // Подготавливаем SQL-запрос для добавления нового товара
-    $stmt = $pdo->prepare("INSERT INTO products (name, description, price, image_url) VALUES (:name, :description, :price, :image_url)");
+    $stmt = $pdo->prepare("INSERT INTO products (name, description, price, category_id, brand, weight, color, material, stock_quantity, is_available, created_at, image_url) VALUES (:name, :description, :price, :category_id, :brand, :weight, :color, :material, :stock_quantity, :is_available, :created_at, :image_url)");
     $stmt->bindParam(':name', $productName);
     $stmt->bindParam(':description', $productDescription);
     $stmt->bindParam(':price', $productPrice);
+    $stmt->bindParam(':category_id', $categoryID);
+    $stmt->bindParam(':brand', $brand);
+    $stmt->bindParam(':weight', $weight);
+    $stmt->bindParam(':color', $color);
+    $stmt->bindParam(':material', $material);
+    $stmt->bindParam(':stock_quantity', $stockQuantity);
+    $stmt->bindParam(':is_available', $isAvailable, PDO::PARAM_INT);
+    $stmt->bindParam(':created_at', $createdAt);
     $stmt->bindParam(':image_url', $imageUrl);
 
     // Выполняем запрос
