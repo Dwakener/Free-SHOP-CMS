@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
 
     // Получаем хеш пароля из базы данных на основе переданного email
-    $stmt = $pdo->prepare("SELECT id, password_hash FROM customers WHERE email = :email");
+    $stmt = $pdo->prepare("SELECT id, password_hash, user_type_id  FROM customers WHERE email = :email");
     $stmt->bindParam(':email', $email);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -28,8 +28,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Здесь вы можете выполнить дополнительные действия для авторизованного пользователя
         // Например, установить сессию или перенаправить на другую страницу
 		$_SESSION['user_id'] = $result['id'];
+        if ($result['user_type_id'] == 1) {
+        // Если user_type_id равен 1, то пользователь - админ, перенаправляем на admin.php
+        header("Location: admin.php");
+        exit;
+		} else {
+        // Иначе пользователь - обычный пользователь, перенаправляем на profile.php
         header("Location: profile.php");
         exit;
+		}
     } else {
         // Если пароль не совпадает или пользователя с таким email не существует
         // Вы можете перенаправить обратно на страницу входа с сообщением об ошибке

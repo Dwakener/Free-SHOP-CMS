@@ -25,8 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // Вставляем данные в таблицу customers
-    $stmt = $pdo->prepare("INSERT INTO customers (first_name, last_name, delivery_address, email, phone_number, password_hash) 
-                          VALUES (:first_name, :last_name, :delivery_address, :email, :phone_number, :password)");
+    $stmt = $pdo->prepare("INSERT INTO customers (first_name, last_name, delivery_address, email, phone_number, password_hash, user_type_id) 
+                          VALUES (:first_name, :last_name, :delivery_address, :email, :phone_number, :password, 3)");
     
     $stmt->bindParam(':first_name', $first_name);
     $stmt->bindParam(':last_name', $last_name);
