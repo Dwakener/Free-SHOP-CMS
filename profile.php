@@ -129,6 +129,7 @@ if (isset($_SESSION['user_id'])) {
 				} else {
 					// Use a fallback image if unable to download the image
 					echo '<img src="fallback_image.jpg" alt="' . (isset($row['name']) ? htmlspecialchars($row['name']) : '') . '">';
+					
 				}
 			} else {
 				// Use a fallback image if image_url is empty
