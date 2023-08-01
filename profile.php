@@ -56,8 +56,8 @@ if (isset($_SESSION['user_id'])) {
     </style>
 	<style>
 	.product-image-container {
-		width: 350px;
-		height: 350px;
+		width: 250px;
+		height: 250px;
 		overflow: hidden;
 	}
 
@@ -95,7 +95,7 @@ if (isset($_SESSION['user_id'])) {
 	try {
 		// Load configuration from config.ini
 		$config = parse_ini_file('config.ini');
-    
+
 		// Connect to the database using PDO with error handling
 		$pdo = new PDO("pgsql:host=" . $config['host'] . ";dbname=" . $config['dbname'], $config['username'], $config['password']);
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -107,10 +107,34 @@ if (isset($_SESSION['user_id'])) {
 		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			echo '<div class="product">';
 			echo '<div class="product-image-container">';
-			// Check if image_url is set, else use a fallback image URL
-			$imageUrl = isset($row['image_url']) ? htmlspecialchars($row['image_url']) : 'fallback_image.jpg';
-			echo '<img src="' . $imageUrl . '" alt="' . (isset($row['name']) ? htmlspecialchars($row['name']) : '') . '">';
+        
+			if (!empty($row['image_url'])) {
+				// Check if image_url is set and not empty, else use a fallback image URL
+				$imageUrl = htmlspecialchars($row['image_url']);
 
+				// Download the image and store it in a temporary file
+				$tempImagePath = __DIR__ . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . uniqid() . '.jpg'; // Unique temporary file path
+
+				$imageData = @file_get_contents($imageUrl);
+
+				if ($imageData !== false) {
+					// Save the image data to the temporary file
+					file_put_contents($tempImagePath, $imageData);
+
+					// Display the image using the temporary file as the source
+					echo '<img src="' . $tempImagePath . '" alt="' . (isset($row['name']) ? htmlspecialchars($row['name']) : '') . '">';
+
+					// Remove the temporary image file after displaying the product card
+					unlink($tempImagePath);
+				} else {
+					// Use a fallback image if unable to download the image
+					echo '<img src="fallback_image.jpg" alt="' . (isset($row['name']) ? htmlspecialchars($row['name']) : '') . '">';
+				}
+			} else {
+				// Use a fallback image if image_url is empty
+				echo '<img src="fallback_image.jpg" alt="' . (isset($row['name']) ? htmlspecialchars($row['name']) : '') . '">';
+			}
+        
 			echo '</div>'; // Close product-image-container
 
 			echo '<h3>' . (isset($row['name']) ? htmlspecialchars($row['name']) : '') . '</h3>';
@@ -125,19 +149,17 @@ if (isset($_SESSION['user_id'])) {
 			$cartItem = $cartItemStmt->fetch(PDO::FETCH_ASSOC);
 
 			if ($cartItem) {
-				echo '<br>';
-				echo '<span>Quantity in Cart: ' . (isset($cartItem['quantity']) ? htmlspecialchars($cartItem['quantity']) : '') . '</span>';
+					echo '<br>';
+					echo '<span>Quantity in Cart: ' . (isset($cartItem['quantity']) ? htmlspecialchars($cartItem['quantity']) : '') . '</span>';
 			}
 
-			echo '</div>';
+				echo '</div>';
 		}
-	} 
-	catch (PDOException $e) {
+	} catch (PDOException $e) {
 		// Handle any database connection or query errors
 		die("Database Error: " . $e->getMessage());
 	}
 	?>
-
     </div>
 	</div>
 
